@@ -1,5 +1,5 @@
 // Databricks notebook source
-// MAGIC %run "../utils"
+// MAGIC %run "../JobMetricsSparkListener"
 
 // COMMAND ----------
 

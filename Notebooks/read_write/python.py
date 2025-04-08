@@ -3,7 +3,7 @@ from time import time
 
 # COMMAND ----------
 
-# MAGIC %run "../utils"
+# MAGIC %run "../JobMetricsSparkListener"
 
 # COMMAND ----------
 
