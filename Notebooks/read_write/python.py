@@ -3,7 +3,11 @@ from time import time
 
 # COMMAND ----------
 
-# MAGIC %run "../JobMetricsSparkListener"
+# MAGIC %scala
+# MAGIC import utils.JobMetricsListener
+# MAGIC
+# MAGIC val listener = new JobMetricsListener()
+# MAGIC spark.sparkContext.addSparkListener(listener)
 
 # COMMAND ----------
 

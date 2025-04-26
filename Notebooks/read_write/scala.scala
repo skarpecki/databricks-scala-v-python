@@ -1,5 +1,8 @@
 // Databricks notebook source
-// MAGIC %run "../JobMetricsSparkListener"
+import utils.JobMetricsListener
+
+val listener = new JobMetricsListener()
+spark.sparkContext.addSparkListener(listener)
 
 // COMMAND ----------
 
