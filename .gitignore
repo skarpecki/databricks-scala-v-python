@@ -1,16 +1,17 @@
 # sbt specific
-scala/dist/*
-scala/target/
-scala/lib_managed/
-scala/src_managed/
-scala/project/boot/
-scala/project/plugins/project/
-scala/project/local-plugins.sbt
-scala/.history
-scala/.ensime
-scala/.ensime_cache/
-scala/.sbt-scripted/
-scala/local.sbt
+Modules/Scala/dist/*
+Modules/Scala/project/target/
+Modules/Scala/target/
+Modules/Scala/lib_managed/
+Modules/Scala/src_managed/
+Modules/Scala/project/boot/
+Modules/Scala/project/plugins/project/
+Modules/Scala/project/local-plugins.sbt
+Modules/Scala/.history
+Modules/Scala/.ensime
+Modules/Scala/.ensime_cache/
+Modules/Scala/.sbt-scripted/
+Modules/Scala/local.sbt
 
 # Bloop
 .bsp
