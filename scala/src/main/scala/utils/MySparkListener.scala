@@ -8,6 +8,8 @@ import org.apache.spark.scheduler.{
 }
 import scala.collection.mutable.ListBuffer
 
+// snake_case to simplify writing to log table
+
 case class StageMetrics(
   stage_id: Int,
   executor_cpu_time_ms: Long,
