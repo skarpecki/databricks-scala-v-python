@@ -1,4 +1,10 @@
 # Databricks notebook source
+# MAGIC %md
+# MAGIC
+# MAGIC Tests will be defined in a single module attached as wheel package. Then there will be a single notebook orchestrating all the code, where test will be passed as a parameter. UDFs can be a little tricky as they will need first to be registered but worst case it will be a single cell in beginning of a notebook that will execute for all, but will not be tracked with listener
+
+# COMMAND ----------
+
 def rw_test():
     n = 7
     table = "samples.tpch.orders"
@@ -122,3 +128,17 @@ time_method(spark, "test123", "123", "logging.metrics.tests_metrics", rw_test)
 # MAGIC %sql 
 # MAGIC
 # MAGIC SELECT * FROM logging.metrics.tests_metrics
+
+# COMMAND ----------
+
+# MAGIC %scala
+# MAGIC import utils.JobMetricsListener
+# MAGIC
+# MAGIC val listener = new JobMetricsListener()
+# MAGIC spark.sparkContext.addSparkListener(listener)
+
+# COMMAND ----------
+
+# MAGIC %scala 
+# MAGIC
+# MAGIC listener.stageMetrics.toDF.show()
