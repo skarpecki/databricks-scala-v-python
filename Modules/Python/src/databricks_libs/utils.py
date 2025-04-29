@@ -4,10 +4,10 @@ from delta.tables import *
 
 def time_method_log_metrics(
     spark,
-    test_name: str,
     job_id: str,
-    metrics_table_name: str,
+    test_name: str,
     language: str,
+    metrics_table_name: str,
     test_func: Callable[[], None]
 ):
     """
@@ -16,10 +16,10 @@ def time_method_log_metrics(
     Args:
         spark: 
             A SparkSession object used to interact with the Delta table.
-        test_name (str): 
-            The name of the test or function being measured.
         job_id (str): 
             A unique identifier for the job execution.
+        test_name (str): 
+            The name of the test or function being measured.
         metrics_table_name (str): 
             The name of the Delta table where metrics will be stored.
         language (str): 
@@ -48,7 +48,7 @@ def time_method_log_metrics(
     (
         dt_metrics.alias("tgt").merge(
             df.alias("src"),
-            "tgt.job_id = src.job_id AND tgt.test_name = src.test_name",
+            "tgt.job_id = src.job_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
         )
         .whenMatchedUpdate(set = {
             "test_name": "src.test_name",

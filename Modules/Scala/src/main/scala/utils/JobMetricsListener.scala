@@ -92,7 +92,7 @@ class JobMetricsListener extends SparkListener {
       val dt_metrics = DeltaTable.forName(spark, metricsTableName)
       dt_metrics.as("tgt").merge(
           df.as("src"),
-          "tgt.job_id = src.job_id AND tgt.test_name = src.test_name",
+          "tgt.job_id = src.job_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
       )
       .whenMatched
       .updateExpr(
