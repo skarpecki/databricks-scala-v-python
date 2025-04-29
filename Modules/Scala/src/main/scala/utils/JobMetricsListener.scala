@@ -7,9 +7,6 @@ import org.apache.spark.scheduler.{
   SparkListenerTaskEnd
 }
 import scala.collection.mutable.ListBuffer
-import io.delta.tables._
-import org.apache.spark.sql.functions._
-import org.apache.spark.sql.SparkSession
 
 // snake_case to simplify writing to log table
 
@@ -71,48 +68,4 @@ class JobMetricsListener extends SparkListener {
       taskMetricsBuffer += task
     }
   }
-
-  def writeAverageMetricsToTable(
-    spark: SparkSession,
-    jobId: String,
-    testName: String,
-    language: String,
-    metricsTableName: String) : Unit = {
-      import spark.implicits._
-      val df = stageMetrics.toDF.select(
-        sum("executor_cpu_time_ms").as("executor_cpu_time_ms"),
-        sum("executor_deserialize_cpu_time_ms").as("executor_deserialize_cpu_time_ms"),
-        sum("executor_deserialize_time_ms").as("executor_deserialize_time_ms"),
-        sum("executor_run_time_ms").as("executor_run_time_ms"),
-        lit(jobId).as("job_id"),
-        lit(testName).as("test_name"),
-        lit(language).as("language")
-      )
-
-      val dt_metrics = DeltaTable.forName(spark, metricsTableName)
-      dt_metrics.as("tgt").merge(
-          df.as("src"),
-          "tgt.job_id = src.job_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
-      )
-      .whenMatched
-      .updateExpr(
-          Map(
-              "language" -> "src.language",
-              "executor_cpu_time_ms" -> "src.executor_cpu_time_ms",
-              "executor_deserialize_cpu_time_ms" -> "src.executor_deserialize_cpu_time_ms",
-              "executor_deserialize_time_ms" -> "src.executor_deserialize_time_ms",
-              "executor_run_time_ms" -> "src.executor_run_time_ms"
-          ))
-      .whenNotMatched
-      .insertExpr(Map(
-          "job_id" -> "src.job_id",
-          "test_name" -> "src.test_name",
-          "language" -> "src.language",
-          "executor_cpu_time_ms" -> "src.executor_cpu_time_ms",
-          "executor_deserialize_cpu_time_ms" -> "src.executor_deserialize_cpu_time_ms",
-          "executor_deserialize_time_ms" -> "src.executor_deserialize_time_ms",
-          "executor_run_time_ms" -> "src.executor_run_time_ms"
-      ))
-      .execute()
-    }
 }
