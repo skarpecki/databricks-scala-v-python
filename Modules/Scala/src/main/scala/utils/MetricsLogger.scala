@@ -11,7 +11,7 @@ class MetricsLogger(
     language: String,
     metricsTableName: String) {
 
-  def timeMethodAndLogMetrics()(testFunc: () => Unit): Unit = {
+  def timeMethodAndLogMetrics(testFunc: () => Unit): Unit = {
     val tstart = System.currentTimeMillis()
 
     // Run the test function
