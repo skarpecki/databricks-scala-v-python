@@ -7,6 +7,7 @@ def time_method_log_metrics(
     test_name: str,
     job_id: str,
     metrics_table_name: str,
+    language: str,
     test_func: Callable[[], None]
 ):
     """
@@ -31,7 +32,6 @@ def time_method_log_metrics(
             - If a matching job_id and test_name exist, updates the record.
             - If no match is found, inserts a new record.
     """
-    language = "python"
     tstart = datetime.now()
     test_func()
     tend = datetime.now()
