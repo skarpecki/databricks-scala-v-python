@@ -42,7 +42,7 @@
 
 # MAGIC %sql
 # MAGIC
-# MAGIC CREATE TABLE IF NOT EXISTS `logging`.`metrics`.`tests_metrics` (
+# MAGIC CREATE OR REPLACE TABLE `logging`.`metrics`.`tests_metrics` (
 # MAGIC   `job_id`  STRING,
 # MAGIC   `test_name` STRING,
 # MAGIC   `language` STRING,

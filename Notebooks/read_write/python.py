@@ -25,8 +25,11 @@ def rw_test():
 
 # MAGIC %scala
 # MAGIC import utils.JobMetricsListener
+# MAGIC import utils.MetricsLogger
 # MAGIC
 # MAGIC val listener = new JobMetricsListener()
+# MAGIC val metricsLogger = new MetricsLogger(spark, "123", "test123", "python", "logging.metrics.tests_metrics")
+# MAGIC
 # MAGIC spark.sparkContext.addSparkListener(listener)
 
 # COMMAND ----------
@@ -37,4 +40,4 @@ time_method_log_metrics(spark, "123", "test123", "python", "logging.metrics.test
 # COMMAND ----------
 
 # MAGIC %scala
-# MAGIC listener.writeAverageMetricsToTable(spark,"123", "test123", "python", "logging.metrics.tests_metrics")
+# MAGIC metricsLogger.writeStageMetricsToTable(listener.stageMetrics)

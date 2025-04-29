@@ -1,32 +1,29 @@
 // Databricks notebook source
-import utils.JobMetricsListener
+import utils.{ JobMetricsListener, MetricsLogger }
 
 val listener = new JobMetricsListener()
+val metricsLogger = new MetricsLogger(spark, "123", "test", "scala", "logging.metrics.tests_metrics")
+
 spark.sparkContext.addSparkListener(listener)
 
 // COMMAND ----------
 
-val start = System.currentTimeMillis
+metricsLogger.timeMethodAndLogMetrics() {
+  () => {
+    val n = 7
+    val table = "samples.tpch.orders"
 
-val n = 7
-val table = "samples.tpch.orders"
+    var df = spark.table(table)
+    for (_ <- 1 to n) {
+      df = df.union(spark.table(table))
+    }
 
-var df = spark.table(table)
-for (_ <- 1 to n) {
-  df = df.union(spark.table(table))
+    df.write
+      .mode("overwrite")
+      .saveAsTable("bronze.default.orders_scala")
+  }
 }
 
-df.write
-  .mode("overwrite")
-  .saveAsTable("bronze.default.orders_scala")
-
-
-val end = System.currentTimeMillis
-
 // COMMAND ----------
 
-listener.stageMetrics.toDF.show()
-
-// COMMAND ----------
-
-println((end - start) / 1000)
+metricsLogger.writeStageMetricsToTable(listener.stageMetrics)
