@@ -28,3 +28,7 @@ metals.sbt
 .idea
 .idea_modules
 /.worksheet/
+
+# Python dist
+Modules/Python/dist
+Modules/Python/.venv
