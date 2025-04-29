@@ -22,6 +22,8 @@ def time_method_log_metrics(
             A unique identifier for the job execution.
         metrics_table_name (str): 
             The name of the Delta table where metrics will be stored.
+        language (str): 
+            Language for which test is performed.
         test_func (Callable[[], None]): 
             A no-argument function to be executed and timed.
 
