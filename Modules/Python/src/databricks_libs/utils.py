@@ -48,7 +48,7 @@ def time_method_log_metrics(
         "run_time_ms": run_time_ms,
         "extended_plan": extended_plan,
         "cost_plan": cost_plan,
-        "formatted_plan": formatted_plan}])
+        "formatted_plan": formatted_plan}]) 
 
     dt_metrics = DeltaTable.forName(spark, metrics_table_name)
     (
@@ -60,7 +60,6 @@ def time_method_log_metrics(
             "test_name": "src.test_name",
             "language": "src.language",
             "run_time_ms": "src.run_time_ms",
-            "execution_plan": "src.execution_plan",
             "extended_plan": "src.extended_plan",
             "cost_plan": "src.cost_plan",
             "formatted_plan": "src.formatted_plan"
