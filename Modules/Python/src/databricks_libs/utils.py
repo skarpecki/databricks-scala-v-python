@@ -35,14 +35,20 @@ def time_method_log_metrics(
             - If no match is found, inserts a new record.
     """
     tstart = datetime.now()
-    test_func()
+    df = test_func()
+    extended_plan = df._sc._jvm.PythonSQLUtils.explainString(df._jdf.queryExecution(), "extended")
+    cost_plan = df._sc._jvm.PythonSQLUtils.explainString(df._jdf.queryExecution(), "cost")
+    formatted_plan = df._sc._jvm.PythonSQLUtils.explainString(df._jdf.queryExecution(), "formatted")
     tend = datetime.now()
     run_time_ms = (int)((tend - tstart).total_seconds() * 1000)
     df = spark.createDataFrame([{
         "job_id": job_id,
         "test_name": test_name,
         "language": language,
-        "run_time_ms": run_time_ms}])
+        "run_time_ms": run_time_ms,
+        "extended_plan": extended_plan,
+        "cost_plan": cost_plan,
+        "formatted_plan": formatted_plan}])
 
     dt_metrics = DeltaTable.forName(spark, metrics_table_name)
     (
@@ -53,13 +59,20 @@ def time_method_log_metrics(
         .whenMatchedUpdate(set = {
             "test_name": "src.test_name",
             "language": "src.language",
-            "run_time_ms": "src.run_time_ms"
+            "run_time_ms": "src.run_time_ms",
+            "execution_plan": "src.execution_plan",
+            "extended_plan": "src.extended_plan",
+            "cost_plan": "src.cost_plan",
+            "formatted_plan": "src.formatted_plan"
         })
         .whenNotMatchedInsert(values = {
             "job_id": "src.job_id",
             "test_name": "src.test_name",
             "language": "src.language",
-            "run_time_ms": "src.run_time_ms"
+            "run_time_ms": "src.run_time_ms",
+            "extended_plan": "src.extended_plan",
+            "cost_plan": "src.cost_plan",
+            "formatted_plan": "src.formatted_plan"
         })
         .execute()
     )

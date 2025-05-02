@@ -22,7 +22,7 @@ class ReadWriteTest(Test):
             .saveAsTable("bronze.default.orders")
         )
 
-        return df.explain()
+        return df
 
 class TestsFactory:
     @staticmethod
