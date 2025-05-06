@@ -59,3 +59,20 @@
 # COMMAND ----------
 
 dbutils.fs.ls("abfss://data@skarpeckiadb.dfs.core.windows.net/data")
+
+# COMMAND ----------
+
+n = 1
+table = "samples.tpch.orders"
+
+df = spark.read.table(table)
+for _ in range(n):
+    df = df.union(
+        spark.read.table(table)
+    )
+
+# (
+#     df.write
+#     .mode("overwrite")
+#     .saveAsTable("bronze.default.orders")
+# )
