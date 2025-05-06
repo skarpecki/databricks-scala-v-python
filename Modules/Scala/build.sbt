@@ -1,6 +1,6 @@
 name := "databrics-libs"
 
-version := "0.4.0"
+version := "0.7.0"
 
 scalaVersion := "2.12.17" // Match your Spark version (e.g., Databricks = Scala 2.12)
 
