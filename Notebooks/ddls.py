@@ -50,7 +50,10 @@
 # MAGIC   `executor_deserialize_cpu_time_ms` INT,
 # MAGIC   `executor_deserialize_time_ms` INT,
 # MAGIC   `executor_run_time_ms` INT,
-# MAGIC   `run_time_ms` INT
+# MAGIC   `run_time_ms` INT,
+# MAGIC   `extended_plan` STRING,
+# MAGIC   `cost_plan` STRING,
+# MAGIC   `formatted_plan` STRING
 # MAGIC )
 
 # COMMAND ----------

@@ -5,24 +5,6 @@
 
 # COMMAND ----------
 
-def rw_test():
-    n = 7
-    table = "samples.tpch.orders"
-
-    df = spark.read.table(table)
-    for _ in range(n):
-        df = df.union(
-            spark.read.table(table)
-        )
-
-    (
-        df.write
-        .mode("overwrite")
-        .saveAsTable("bronze.default.orders_py")
-    )
-
-# COMMAND ----------
-
 # MAGIC %scala
 # MAGIC import utils.JobMetricsListener
 # MAGIC import utils.MetricsLogger
@@ -35,9 +17,17 @@ def rw_test():
 # COMMAND ----------
 
 from databricks_libs.utils import time_method_log_metrics
-time_method_log_metrics(spark, "123", "test123", "python", "logging.metrics.tests_metrics", rw_test)
+from databricks_libs.tests import TestsFactory
+
+time_method_log_metrics(spark, "123", "test123", "python", "logging.metrics.tests_metrics", TestsFactory().get_test_func("rw_test", spark))
 
 # COMMAND ----------
 
 # MAGIC %scala
 # MAGIC metricsLogger.writeStageMetricsToTable(listener.stageMetrics)
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC SELECT * FROM logging.metrics.tests_metrics
