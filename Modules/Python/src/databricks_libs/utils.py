@@ -1,6 +1,6 @@
 from datetime import datetime
 from collections.abc import Callable
-from delta.tables import *
+from delta.tables import DeltaTable
 
 def time_method_log_metrics(
     spark,
@@ -20,27 +20,23 @@ def time_method_log_metrics(
             A unique identifier for the job execution.
         test_name (str): 
             The name of the test or function being measured.
+        language (str): 
+            Language for which test is performed.    
         metrics_table_name (str): 
             The name of the Delta table where metrics will be stored.
-        language (str): 
-            Language for which test is performed.
         test_func (Callable[[], None]): 
             A no-argument function to be executed and timed.
-
-    Functionality:
-        - Executes `test_func` and measures its runtime in milliseconds.
-        - Creates a DataFrame containing job_id, test_name, language (hardcoded to "python"), and run time.
-        - Merges the result into the specified Delta table:
-            - If a matching job_id and test_name exist, updates the record.
-            - If no match is found, inserts a new record.
     """
-    tstart = datetime.now()
-    df = test_func()
-    extended_plan = df._sc._jvm.PythonSQLUtils.explainString(df._jdf.queryExecution(), "extended")
-    cost_plan = df._sc._jvm.PythonSQLUtils.explainString(df._jdf.queryExecution(), "cost")
-    formatted_plan = df._sc._jvm.PythonSQLUtils.explainString(df._jdf.queryExecution(), "formatted")
-    tend = datetime.now()
-    run_time_ms = (int)((tend - tstart).total_seconds() * 1000)
+    t_start = datetime.now()
+    df_test = test_func(spark)
+    # Action to force execution
+    df_test.show(n=100)
+    t_end = datetime.now()
+    run_time_ms = (int)((t_end - t_start).total_seconds() * 1000)
+    
+    extended_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "extended")
+    cost_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "cost")
+    formatted_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "formatted")
     df = spark.createDataFrame([{
         "job_id": job_id,
         "test_name": test_name,

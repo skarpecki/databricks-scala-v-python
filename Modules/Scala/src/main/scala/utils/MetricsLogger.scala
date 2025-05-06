@@ -11,11 +11,13 @@ class MetricsLogger(
     language: String,
     metricsTableName: String) {
 
-  def timeMethodAndLogMetrics(testFunc: () => Unit): Unit = {
+  def timeMethodAndLogMetrics(testFunc: SparkSession => DataFrame): Unit = {
     val tstart = System.currentTimeMillis()
 
     // Run the test function
-    testFunc()
+    val df_test = testFunc(this.spark)
+    // Force evaluation by calling an action
+    df_test.show(100)
 
     val tend = System.currentTimeMillis()
     val runTimeMs = (tend - tstart).toInt
