@@ -6,6 +6,7 @@ def time_method_log_metrics(
     spark,
     job_id: str,
     run_id: str,
+    task_id: str,
     test_name: str,
     language: str,
     metrics_table_name: str,
@@ -20,7 +21,9 @@ def time_method_log_metrics(
         job_id (str): 
             A unique identifier for the job.
         run_id (str): 
-            A unique identifier for the job run.    
+            A unique identifier for the job run.
+        run_id (str): 
+            A unique identifier for the task in a job run combination.  
         test_name (str): 
             The name of the test or function being measured.
         language (str): 
@@ -43,6 +46,7 @@ def time_method_log_metrics(
     df = spark.createDataFrame([{
         "job_id": job_id,
         "run_id": run_id,
+        "task_id": task_id,
         "test_name": test_name,
         "language": language,
         "run_time_ms": run_time_ms,
@@ -54,7 +58,11 @@ def time_method_log_metrics(
     (
         dt_metrics.alias("tgt").merge(
             df.alias("src"),
-            "tgt.job_id = src.job_id AND tgt.run_id = src.run_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
+            """tgt.job_id = src.job_id
+            AND tgt.run_id = src.run_id
+            AND tgt.task_id = src.task_id
+            AND tgt.test_name = src.test_name
+            AND tgt.language = src.language""",
         )
         .whenMatchedUpdate(set = {
             "test_name": "src.test_name",
@@ -67,6 +75,7 @@ def time_method_log_metrics(
         .whenNotMatchedInsert(values = {
             "job_id": "src.job_id",
             "run_id": "src.run_id",
+            "task_id": "src.task_id",
             "test_name": "src.test_name",
             "language": "src.language",
             "run_time_ms": "src.run_time_ms",
