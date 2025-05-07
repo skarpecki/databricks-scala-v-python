@@ -27,3 +27,8 @@ time_method_log_metrics(spark, "123", "join_group_avg", "python", "logging.metri
 
 # MAGIC %scala
 # MAGIC metricsLogger.writeStageMetricsToTable(listener.stageMetrics)
+
+# COMMAND ----------
+
+# MAGIC %sql 
+# MAGIC SELECT * FROM logging.metrics.tests_metrics
