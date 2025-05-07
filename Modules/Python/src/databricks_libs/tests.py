@@ -8,6 +8,7 @@ class Test:
 
 
 class JoinGroupAverageTest(Test):
+    code = "join_group_avg"
     def test_func(self, spark) -> DataFrame:
         df_o = spark.read.table("bronze.default.orders")
         df_c = spark.read.table("bronze.default.customer")
@@ -31,7 +32,15 @@ class JoinGroupAverageTest(Test):
         return df
 
 class TestsFactory:
-    @staticmethod
-    def get_test_func(code: str) -> Test:
-        if code == 'join_group_avg':
-            return JoinGroupAverageTest().test_func
+    def __init__(self):
+        self.tests = [ 
+            JoinGroupAverageTest(),
+        ]
+
+        self.tests_dict = { test.code: test for test in self.tests }
+    def get_test_func(self, code: str) -> Test:
+        try:
+            return self.tests_dict[code].test_func
+        except KeyError:
+            raise ValueError(f"Unknown test code: {code}. Accepted " +
+                f"codes are {' '.join(self.tests_dict.keys())} .")
