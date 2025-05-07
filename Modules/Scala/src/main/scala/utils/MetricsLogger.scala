@@ -8,6 +8,7 @@ import org.apache.spark.sql.execution.{ExtendedMode, CostMode, FormattedMode}
 class MetricsLogger(    
     spark: SparkSession,
     jobId: String,
+    runId: String,
     testName: String,
     language: String,
     metricsTableName: String) {
@@ -31,6 +32,7 @@ class MetricsLogger(
     val df = Seq(
       (
         jobId,
+        runId,
         testName,
         language,
         runTimeMs,
@@ -40,6 +42,7 @@ class MetricsLogger(
       )
     ).toDF(
       "job_id",
+      "run_id",
       "test_name",
       "language",
       "run_time_ms",
@@ -53,7 +56,7 @@ class MetricsLogger(
     deltaTable.as("tgt")
       .merge(
         df.as("src"),
-        "tgt.job_id = src.job_id AND tgt.test_name = src.test_name AND tgt.language = src.language"
+        "tgt.job_id = src.job_id AND tgt.run_id = src.run_id AND tgt.test_name = src.test_name AND tgt.language = src.language"
       )
       .whenMatched()
       .updateExpr(Map(
@@ -67,6 +70,7 @@ class MetricsLogger(
       .whenNotMatched()
       .insertExpr(Map(
         "job_id" -> "src.job_id",
+        "run_id" -> "src.run_id",
         "test_name" -> "src.test_name",
         "language" -> "src.language",
         "run_time_ms" -> "src.run_time_ms",
@@ -86,6 +90,7 @@ class MetricsLogger(
         sum("executor_deserialize_time_ms").as("executor_deserialize_time_ms"),
         sum("executor_run_time_ms").as("executor_run_time_ms"),
         lit(jobId).as("job_id"),
+        lit(runId).as("run_id"),
         lit(testName).as("test_name"),
         lit(language).as("language")
       )
@@ -93,7 +98,7 @@ class MetricsLogger(
       val dt_metrics = DeltaTable.forName(spark, metricsTableName)
       dt_metrics.as("tgt").merge(
           df.as("src"),
-          "tgt.job_id = src.job_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
+          "tgt.job_id = src.job_id AND tgt.run_id = src.run_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
       )
       .whenMatched
       .updateExpr(
@@ -107,6 +112,7 @@ class MetricsLogger(
       .whenNotMatched
       .insertExpr(Map(
           "job_id" -> "src.job_id",
+          "run_id" -> "src.run_id",
           "test_name" -> "src.test_name",
           "language" -> "src.language",
           "executor_cpu_time_ms" -> "src.executor_cpu_time_ms",

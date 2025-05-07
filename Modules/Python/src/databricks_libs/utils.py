@@ -5,6 +5,7 @@ from delta.tables import DeltaTable
 def time_method_log_metrics(
     spark,
     job_id: str,
+    run_id: str,
     test_name: str,
     language: str,
     metrics_table_name: str,
@@ -17,7 +18,9 @@ def time_method_log_metrics(
         spark: 
             A SparkSession object used to interact with the Delta table.
         job_id (str): 
-            A unique identifier for the job execution.
+            A unique identifier for the job.
+        run_id (str): 
+            A unique identifier for the job run.    
         test_name (str): 
             The name of the test or function being measured.
         language (str): 
@@ -39,6 +42,7 @@ def time_method_log_metrics(
     formatted_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "formatted")
     df = spark.createDataFrame([{
         "job_id": job_id,
+        "run_id": run_id,
         "test_name": test_name,
         "language": language,
         "run_time_ms": run_time_ms,
@@ -50,7 +54,7 @@ def time_method_log_metrics(
     (
         dt_metrics.alias("tgt").merge(
             df.alias("src"),
-            "tgt.job_id = src.job_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
+            "tgt.job_id = src.job_id AND tgt.run_id = src.run_id AND tgt.test_name = src.test_name AND tgt.language = src.language",
         )
         .whenMatchedUpdate(set = {
             "test_name": "src.test_name",
@@ -62,6 +66,7 @@ def time_method_log_metrics(
         })
         .whenNotMatchedInsert(values = {
             "job_id": "src.job_id",
+            "run_id": "src.run_id",
             "test_name": "src.test_name",
             "language": "src.language",
             "run_time_ms": "src.run_time_ms",
