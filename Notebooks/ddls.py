@@ -45,6 +45,7 @@
 # MAGIC CREATE OR REPLACE TABLE `logging`.`metrics`.`tests_metrics` (
 # MAGIC   `job_id`  STRING,
 # MAGIC   `run_id`  STRING,
+# MAGIC   `task_id`  STRING,
 # MAGIC   `test_name` STRING,
 # MAGIC   `language` STRING,
 # MAGIC   `executor_cpu_time_ms` INT,
@@ -77,3 +78,9 @@ for _ in range(n):
 #     .mode("overwrite")
 #     .saveAsTable("bronze.default.orders")
 # )
+
+# COMMAND ----------
+
+# MAGIC %sql
+# MAGIC
+# MAGIC select * from logging.metrics.tests_metrics
