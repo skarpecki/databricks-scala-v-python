@@ -55,7 +55,9 @@
 # MAGIC   `run_time_ms` INT,
 # MAGIC   `extended_plan` STRING,
 # MAGIC   `cost_plan` STRING,
-# MAGIC   `formatted_plan` STRING
+# MAGIC   `formatted_plan` STRING,
+# MAGIC   `inserted_at` TIMESTAMP,
+# MAGIC   `updated_at` TIMESTAMP
 # MAGIC )
 
 # COMMAND ----------
@@ -78,9 +80,3 @@ for _ in range(n):
 #     .mode("overwrite")
 #     .saveAsTable("bronze.default.orders")
 # )
-
-# COMMAND ----------
-
-# MAGIC %sql
-# MAGIC
-# MAGIC select * from logging.metrics.tests_metrics
