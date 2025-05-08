@@ -1,6 +1,7 @@
 from datetime import datetime
 from collections.abc import Callable
 from delta.tables import DeltaTable
+from pyspark.sql.functions import current_timestamp
 
 def time_method_log_metrics(
     spark,
@@ -52,7 +53,9 @@ def time_method_log_metrics(
         "run_time_ms": run_time_ms,
         "extended_plan": extended_plan,
         "cost_plan": cost_plan,
-        "formatted_plan": formatted_plan}]) 
+        "formatted_plan": formatted_plan}]).withColumn(
+            "current_timestamp", current_timestamp()
+    )
 
     dt_metrics = DeltaTable.forName(spark, metrics_table_name)
     (
@@ -70,7 +73,8 @@ def time_method_log_metrics(
             "run_time_ms": "src.run_time_ms",
             "extended_plan": "src.extended_plan",
             "cost_plan": "src.cost_plan",
-            "formatted_plan": "src.formatted_plan"
+            "formatted_plan": "src.formatted_plan",
+            "updated_at": "src.current_timestamp"
         })
         .whenNotMatchedInsert(values = {
             "job_id": "src.job_id",
@@ -81,7 +85,9 @@ def time_method_log_metrics(
             "run_time_ms": "src.run_time_ms",
             "extended_plan": "src.extended_plan",
             "cost_plan": "src.cost_plan",
-            "formatted_plan": "src.formatted_plan"
+            "formatted_plan": "src.formatted_plan",
+            "inserted_at": "src.current_timestamp",
+            "updated_at": "src.current_timestamp"
         })
         .execute()
     )

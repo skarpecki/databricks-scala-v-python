@@ -52,6 +52,8 @@ class MetricsLogger(
       "extended_plan",
       "cost_plan",
       "formatted_plan"
+    ).withColumn(
+      "current_timestamp", current_timestamp()
     )
 
     val deltaTable = DeltaTable.forName(spark, metricsTableName)
@@ -72,7 +74,8 @@ class MetricsLogger(
         "run_time_ms" -> "src.run_time_ms",
         "extended_plan" -> "src.extended_plan",
         "cost_plan" -> "src.cost_plan",
-        "formatted_plan" -> "src.formatted_plan"
+        "formatted_plan" -> "src.formatted_plan",
+        "updated_at" -> "src.current_timestamp"
       ))
       .whenNotMatched()
       .insertExpr(Map(
@@ -84,7 +87,9 @@ class MetricsLogger(
         "run_time_ms" -> "src.run_time_ms",
         "extended_plan" -> "src.extended_plan",
         "cost_plan" -> "src.cost_plan",
-        "formatted_plan" -> "src.formatted_plan"
+        "formatted_plan" -> "src.formatted_plan",
+        "inserted_at" -> "src.current_timestamp",
+        "updated_at" -> "src.current_timestamp"
       ))
       .execute()
   }
@@ -101,7 +106,8 @@ class MetricsLogger(
         lit(runId).as("run_id"),
         lit(taskId).as("task_id"),
         lit(testName).as("test_name"),
-        lit(language).as("language")
+        lit(language).as("language"),
+        current_timestamp().as("current_timestamp")
       )
 
       val dt_metrics = DeltaTable.forName(spark, metricsTableName)
@@ -120,7 +126,8 @@ class MetricsLogger(
               "executor_cpu_time_ms" -> "src.executor_cpu_time_ms",
               "executor_deserialize_cpu_time_ms" -> "src.executor_deserialize_cpu_time_ms",
               "executor_deserialize_time_ms" -> "src.executor_deserialize_time_ms",
-              "executor_run_time_ms" -> "src.executor_run_time_ms"
+              "executor_run_time_ms" -> "src.executor_run_time_ms",
+              "updated_at" -> "src.current_timestamp"
           ))
       .whenNotMatched
       .insertExpr(Map(
@@ -132,7 +139,9 @@ class MetricsLogger(
           "executor_cpu_time_ms" -> "src.executor_cpu_time_ms",
           "executor_deserialize_cpu_time_ms" -> "src.executor_deserialize_cpu_time_ms",
           "executor_deserialize_time_ms" -> "src.executor_deserialize_time_ms",
-          "executor_run_time_ms" -> "src.executor_run_time_ms"
+          "executor_run_time_ms" -> "src.executor_run_time_ms",
+          "inserted_at" -> "src.current_timestamp",
+          "updated_at" -> "src.current_timestamp"
       ))
       .execute()
     }
