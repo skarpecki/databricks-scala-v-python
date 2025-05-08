@@ -33,10 +33,12 @@ metrics_table = dbutils.widgets.get("metrics_table")
 # COMMAND ----------
 
 # Here Python UDFs will be registered so they can be used in a test method 
+# Maybe do it in another notebook
 
 # COMMAND ----------
 
-# Here Scala UDFs will be registered so they can be used in a test method
+# Here Python UDFs will be registered so they can be used in a test method 
+# Maybe do it in another notebook
 
 # COMMAND ----------
 
