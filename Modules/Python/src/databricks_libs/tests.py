@@ -1,11 +1,11 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import avg
+from udf_registry import UdfRegistry
 
 
 class Test:
     def test_func(spark: SparkSession) -> DataFrame:
         raise NotImplementedError
-
 
 class JoinGroupAverageTest(Test):
     code = "join_group_avg"
@@ -31,10 +31,54 @@ class JoinGroupAverageTest(Test):
 
         return df
 
+
+class LeftSparkTest(Test):
+    code = "left_spark"
+    def test_func(self, spark) -> DataFrame:
+        df = (
+            spark.read.table("bronze.default.orders")
+                .selectExpr("left(o_comment, 3) AS left_o_comment")
+                .orderBy("left_o_comment") # To force executing for all rows
+        )
+        return df
+
+
+class LeftPythonUdf(Test):
+    """ 
+    Remember to register UDFs before running
+    """
+    code = "left_python_udf"
+    def test_func(self, spark) -> DataFrame:
+        df = (
+            spark.read.table("bronze.default.orders")
+                .selectExpr(f"{UdfRegistry.LEFT_PYTHON_UDF}(o_comment, 3) AS left_o_comment")
+                .orderBy("left_o_comment") # To force executing for all rows
+        )
+
+        return df
+
+class LeftScalaUdf(Test):
+    """ 
+    Remember to register UDFs before running
+    """
+    code = "left_scala_udf"
+    def test_func(self, spark) -> DataFrame:
+        df = (
+            spark.read.table("bronze.default.orders")
+                .selectExpr(f"{UdfRegistry.LEFT_SCALA_UDF}(o_comment, 3) AS left_o_comment")
+                .orderBy("left_o_comment") # To force executing for all rows
+        )
+
+        return df
+
+
 class TestsFactory:
     def __init__(self):
         self.tests = [ 
             JoinGroupAverageTest(),
+            LeftSparkTest(),
+            LeftPythonUdf(),
+            LeftScalaUdf()
         ]
 
         self.tests_dict = { test.code: test for test in self.tests }
