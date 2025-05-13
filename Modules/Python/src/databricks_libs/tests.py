@@ -1,6 +1,6 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import avg
-from udf_registry import UdfRegistry
+from .udf_registry import UdfRegistry
 
 
 class Test:
