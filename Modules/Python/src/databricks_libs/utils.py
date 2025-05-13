@@ -12,7 +12,7 @@ def time_method_log_metrics(
     test_name: str,
     language: str,
     metrics_table_name: str,
-    test_func: Callable[[], None]
+    test_object: Test
 ):
     """
     Measures the execution time of a test function and logs the result into a Delta table.
@@ -36,9 +36,9 @@ def time_method_log_metrics(
             A no-argument function to be executed and timed.
     """
     shift = 28 # 1 << 28 = 2^28 = 268,435,456 = 2019.6 MiB as per logical plan
-    df_test = Test.prepare_dataframe(spark, shift, False)
+    df_test = test_object.prepare_dataframe(spark, shift, False)
     t_start = datetime.now()
-    df_test = test_func(spark, df_test)
+    df_test = test_object.test_func(spark, df_test)
     # Action to force execution - write to nowhere
     df_test.write.format("noop").mode("overwrite").save()
     t_end = datetime.now()

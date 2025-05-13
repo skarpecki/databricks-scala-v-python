@@ -9,8 +9,7 @@ class Test:
     def test_func(spark: SparkSession) -> DataFrame:
         raise NotImplementedError
     
-    @staticmethod
-    def prepare_dataframe(spark: SparkSession, shift: int, print_plan: bool = False) -> DataFrame:
+    def prepare_dataframe(self, spark: SparkSession, shift: int, print_plan: bool = False) -> DataFrame:
         df = ( 
             spark.range(0, 1 << shift )
                 .toDF("id")
@@ -47,6 +46,9 @@ class JoinGroupAverageTest(Test):
         )
         return df
 
+    def prepare_dataframe(self, spark: SparkSession, shift: int, print_plan: bool = False) -> DataFrame:
+        # Will not be used, hence None is fine
+        return None
 
 class LeftSparkTest(Test):
     code = "left_spark"
@@ -98,9 +100,9 @@ class TestsFactory:
         ]
         self.tests_dict = { test.code: test for test in self.tests }
 
-    def get_test_func(self, code: str) -> Test:
+    def get_test_object(self, code: str) -> Test:
         try:
-            return self.tests_dict[code].test_func
+            return self.tests_dict[code]
         except KeyError:
             raise ValueError(f"Unknown test code: {code}. Accepted " +
                 f"codes are {' '.join(self.tests_dict.keys())} .")

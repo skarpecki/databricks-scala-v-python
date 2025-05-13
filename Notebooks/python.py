@@ -59,7 +59,7 @@ UdfRegistry().register_udf(spark)
 from databricks_libs.utils import time_method_log_metrics
 from databricks_libs.tests import TestsFactory
 
-time_method_log_metrics(spark, job_id, run_id, task_id, test_code, language, metrics_table, TestsFactory().get_test_func(test_code))
+time_method_log_metrics(spark, job_id, run_id, task_id, test_code, language, metrics_table, TestsFactory().get_test_object(test_code))
 
 # COMMAND ----------
 
