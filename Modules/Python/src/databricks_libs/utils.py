@@ -2,6 +2,7 @@ from datetime import datetime
 from collections.abc import Callable
 from delta.tables import DeltaTable
 from pyspark.sql.functions import current_timestamp
+from .tests import Test
 
 def time_method_log_metrics(
     spark,
@@ -34,10 +35,11 @@ def time_method_log_metrics(
         test_func (Callable[[], None]): 
             A no-argument function to be executed and timed.
     """
+    df_test = Test.prepare_dataframe(spark)
     t_start = datetime.now()
-    df_test = test_func(spark)
-    # Action to force execution
-    df_test.show(n=100)
+    df_test = test_func(spark, df_test)
+    # Action to force execution - write to nowhere
+    df_test.write.format("noop").mode("overwrite").save()
     t_end = datetime.now()
     run_time_ms = (int)((t_end - t_start).total_seconds() * 1000)
     
