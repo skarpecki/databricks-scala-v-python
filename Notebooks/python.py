@@ -32,13 +32,16 @@ metrics_table = dbutils.widgets.get("metrics_table")
 
 # COMMAND ----------
 
-# Here Python UDFs will be registered so they can be used in a test method 
-# Maybe do it in another notebook
+from databricks_libs.udf_registry import UdfRegistry
+UdfRegistry(spark).register_udf()
 
 # COMMAND ----------
 
-# Here Python UDFs will be registered so they can be used in a test method 
-# Maybe do it in another notebook
+# MAGIC %scala
+# MAGIC
+# MAGIC import tests.UdfRegistry
+# MAGIC
+# MAGIC UdfRegistry.registerUdfs(spark)
 
 # COMMAND ----------
 
