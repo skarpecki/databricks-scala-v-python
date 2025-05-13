@@ -13,9 +13,9 @@ class UdfRegistry:
         return F.udf(_left_udf, StringType())
     
     def _left_pandas_udf_factory(self, n):
-        def left_pandas_udf(s: pd.Series) -> pd.Series:
+        def _left_pandas_udf(s: pd.Series) -> pd.Series:
             return s.str.slice(0, n) 
-        return F.pandas_udf(left_pandas_udf, StringType())
+        return F.pandas_udf(_left_pandas_udf, StringType())
     
     def register_udf(self, spark):
         # Left python udf
