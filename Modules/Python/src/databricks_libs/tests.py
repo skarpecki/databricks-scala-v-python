@@ -4,17 +4,18 @@ from .udf_registry import UdfRegistry
 
 
 class Test:
+    COLUMN = "rand_val"
+
     def test_func(spark: SparkSession) -> DataFrame:
         raise NotImplementedError
     
     @staticmethod
-    def prepare_dataframe(spark: SparkSession, print_plan: bool = False) -> DataFrame:
-        # 1 << 20 = 2^28 = 268,435,456 = 2019.6 MiB as per logical plan
+    def prepare_dataframe(spark: SparkSession, shift: int, print_plan: bool = False) -> DataFrame:
         df = ( 
-            spark.range(0, 1 << 28 )
+            spark.range(0, 1 << shift )
                 .toDF("id")
-                .withColumn("rand_val", rand() * 10000)
-                .select(format_string("%d", col("rand_val").cast("int")).alias("rand_val"))
+                .withColumn(Test.COLUMN, rand() * 10000)
+                .select(format_string("%d", col(Test.COLUMN).cast("int")).alias(Test.COLUMN))
         )
 
         df.persist()
@@ -50,7 +51,7 @@ class JoinGroupAverageTest(Test):
 class LeftSparkTest(Test):
     code = "left_spark"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr("left(o_comment, 3) AS left_o_comment") 
+        return df.selectExpr(f"left({Test.COLUMN}, 3) AS {Test.COLUMN}") 
 
 
 class LeftPythonArrowUdf(Test):
@@ -59,7 +60,7 @@ class LeftPythonArrowUdf(Test):
     """
     code = "left_python_arrow_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_ARROW_UDF}(o_comment, 3) AS left_o_comment")
+        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_ARROW_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
     
 class LeftPythonNonArrowUdf(Test):
     """ 
@@ -67,7 +68,7 @@ class LeftPythonNonArrowUdf(Test):
     """
     code = "left_python_pickled_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_PICKLED_UDF}(o_comment, 3) AS left_o_comment")
+        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_PICKLED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
 
 class LeftScalaUdf(Test):
     """ 
@@ -75,7 +76,7 @@ class LeftScalaUdf(Test):
     """
     code = "left_scala_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_SCALA_UDF}(o_comment, 3) AS left_o_comment")
+        return df.selectExpr(f"{UdfRegistry.LEFT_SCALA_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
 
 class LeftPandasUdf(Test):
     """ 
@@ -83,7 +84,7 @@ class LeftPandasUdf(Test):
     """
     code = "left_pandas_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PANDAS_UDF}(o_comment) AS left_o_comment")
+        return df.selectExpr(f"{UdfRegistry.LEFT_PANDAS_UDF}({Test.COLUMN}) AS {Test.COLUMN}")
 
 class TestsFactory:
     def __init__(self):

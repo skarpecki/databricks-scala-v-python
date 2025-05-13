@@ -35,7 +35,8 @@ def time_method_log_metrics(
         test_func (Callable[[], None]): 
             A no-argument function to be executed and timed.
     """
-    df_test = Test.prepare_dataframe(spark)
+    shift = 28 # 1 << 28 = 2^28 = 268,435,456 = 2019.6 MiB as per logical plan
+    df_test = Test.prepare_dataframe(spark, shift, False)
     t_start = datetime.now()
     df_test = test_func(spark, df_test)
     # Action to force execution - write to nowhere
@@ -46,6 +47,9 @@ def time_method_log_metrics(
     extended_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "extended")
     cost_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "cost")
     formatted_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "formatted")
+
+    df_test.unpersist()
+
     df = spark.createDataFrame([{
         "job_id": job_id,
         "run_id": run_id,
