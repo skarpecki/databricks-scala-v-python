@@ -43,15 +43,29 @@ class LeftSparkTest(Test):
         return df
 
 
-class LeftPythonUdf(Test):
+class LeftPythonArrowUdf(Test):
     """ 
     Remember to register UDFs before running
     """
-    code = "left_python_udf"
+    code = "left_python_arrow_udf"
     def test_func(self, spark) -> DataFrame:
         df = (
             spark.read.table("bronze.default.orders")
-                .selectExpr(f"{UdfRegistry.LEFT_PYTHON_UDF}(o_comment, 3) AS left_o_comment")
+                .selectExpr(f"{UdfRegistry.LEFT_PYTHON_ARROW_UDF}(o_comment, 3) AS left_o_comment")
+                .orderBy("left_o_comment") # To force executing for all rows
+        )
+
+        return df
+    
+class LeftPythonNonArrowUdf(Test):
+    """ 
+    Remember to register UDFs before running
+    """
+    code = "left_python_non_arrow_udf"
+    def test_func(self, spark) -> DataFrame:
+        df = (
+            spark.read.table("bronze.default.orders")
+                .selectExpr(f"{UdfRegistry.LEFT_PYTHON_NON_ARROW_UDF}(o_comment, 3) AS left_o_comment")
                 .orderBy("left_o_comment") # To force executing for all rows
         )
 
@@ -90,7 +104,8 @@ class TestsFactory:
         self.tests = [ 
             JoinGroupAverageTest(),
             LeftSparkTest(),
-            LeftPythonUdf(),
+            LeftPythonArrowUdf(),
+            LeftPythonNonArrowUdf(),
             LeftScalaUdf(),
             LeftPandasUdf()
         ]
