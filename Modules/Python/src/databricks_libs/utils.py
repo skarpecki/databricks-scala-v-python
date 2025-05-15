@@ -39,8 +39,6 @@ def time_method_log_metrics(
     df_test = test_object.prepare_dataframe(spark, shift, False)
     t_start = datetime.now()
     df_test = test_object.test_func(spark, df_test)
-    # Action to force execution - write to nowhere
-    df_test.write.format("noop").mode("overwrite").save()
     t_end = datetime.now()
     run_time_ms = (int)((t_end - t_start).total_seconds() * 1000)
     

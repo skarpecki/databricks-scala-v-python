@@ -1,7 +1,7 @@
 from pyspark.sql import DataFrame, SparkSession
 from pyspark.sql.functions import avg, format_string, rand, col
 from .udf_registry import UdfRegistry
-
+from pyspark.sql.types import StructType
 
 class Test:
     COLUMN = "rand_val"
@@ -30,7 +30,7 @@ class JoinGroupAverageTest(Test):
         df_c = spark.read.table("bronze.default.customer")
         df_n = spark.read.table("bronze.default.nation")
 
-        df = (
+        df_test = (
             df_o
             .join(
                 df_c,
@@ -44,17 +44,20 @@ class JoinGroupAverageTest(Test):
             .agg(avg("o_totalprice").alias("average_totalprice"))
             .orderBy("n_name")
         )
-        return df
+
+        df_test.write.format("noop").mode("overwrite").save()
+        return df_test
 
     def prepare_dataframe(self, spark: SparkSession, shift: int, print_plan: bool = False) -> DataFrame:
-        # Will not be used, hence None is fine
-        return None
+        # Will not be used, hence return empty DataFrame
+        return spark.createDataFrame([], StructType([]))
 
 class LeftSparkTest(Test):
     code = "left_spark"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"left({Test.COLUMN}, 3) AS {Test.COLUMN}") 
-
+        df_test = df.selectExpr(f"left({Test.COLUMN}, 3) AS {Test.COLUMN}") 
+        df_test.write.format("noop").mode("overwrite").save()
+        return df_test
 
 class LeftPythonArrowUdf(Test):
     """ 
@@ -62,7 +65,9 @@ class LeftPythonArrowUdf(Test):
     """
     code = "left_python_arrow_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_ARROW_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
+        df_test = df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_ARROW_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
+        df_test.write.format("noop").mode("overwrite").save()
+        return df_test
     
 class LeftPythonNonArrowUdf(Test):
     """ 
@@ -70,24 +75,30 @@ class LeftPythonNonArrowUdf(Test):
     """
     code = "left_python_serialized_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_SERIALIZED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
-
+        df_test = df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_SERIALIZED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
+        df_test.write.format("noop").mode("overwrite").save()
+        return df_test
+    
 class LeftScalaUdf(Test):
     """ 
     Remember to register UDFs before running
     """
     code = "left_scala_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_SCALA_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
-
+        df_test = df.selectExpr(f"{UdfRegistry.LEFT_SCALA_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
+        df_test.write.format("noop").mode("overwrite").save()
+        return df_test
+    
 class LeftPandasUdf(Test):
     """ 
     Remember to register UDFs before running
     """
     code = "left_pandas_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PANDAS_UDF}({Test.COLUMN}) AS {Test.COLUMN}")
-
+        df_test = df.selectExpr(f"{UdfRegistry.LEFT_PANDAS_UDF}({Test.COLUMN}) AS {Test.COLUMN}")
+        df_test.write.format("noop").mode("overwrite").save()
+        return df_test
+    
 class TestsFactory:
     def __init__(self):
         self.tests = [ 
