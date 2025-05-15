@@ -7,7 +7,7 @@ import org.apache.spark.storage.StorageLevel
 trait TestCase {
   val COLUMN = "rand_val"
 
-  def name: String
+  def code: String
   
   def testFunc(spark: SparkSession, df_arg: DataFrame): DataFrame
   

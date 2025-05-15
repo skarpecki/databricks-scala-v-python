@@ -5,9 +5,14 @@ import org.apache.spark.sql.{SparkSession, DataFrame}
 object TestsFactory {
   val tests: Seq[TestCase] = Seq(
     JoinGroupAverageTest,
+    LeftPandasUdfTest,
+    LeftPythonArrowUdfTest,
+    LeftPythonPickledUdfTest,
+    LeftScalaUdfTest,
+    LeftSparkTest
   )
 
-  val testsMap: Map[String, TestCase] = tests.map(test => test.name -> test).toMap
+  val testsMap: Map[String, TestCase] = tests.map(test => test.code -> test).toMap
 
   def getTestObject(code: String): TestCase = {
     testsMap.getOrElse(code, {

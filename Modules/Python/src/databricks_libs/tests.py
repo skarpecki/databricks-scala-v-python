@@ -69,17 +69,17 @@ class LeftPythonArrowUdf(Test):
         df_test.write.format("noop").mode("overwrite").save()
         return df_test
     
-class LeftPythonNonArrowUdf(Test):
+class LeftPythonPickledUdfTest(Test):
     """ 
     Remember to register UDFs before running
     """
-    code = "left_python_serialized_udf"
+    code = "left_python_pickled_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        df_test = df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_SERIALIZED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
+        df_test = df.selectExpr(f"{UdfRegistry.LEFT_PYHON_PICKLED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
         df_test.write.format("noop").mode("overwrite").save()
         return df_test
     
-class LeftScalaUdf(Test):
+class LeftScalaUdfTest(Test):
     """ 
     Remember to register UDFs before running
     """
@@ -89,7 +89,7 @@ class LeftScalaUdf(Test):
         df_test.write.format("noop").mode("overwrite").save()
         return df_test
     
-class LeftPandasUdf(Test):
+class LeftPandasUdfTest(Test):
     """ 
     Remember to register UDFs before running
     """
@@ -105,9 +105,9 @@ class TestsFactory:
             JoinGroupAverageTest(),
             LeftSparkTest(),
             LeftPythonArrowUdf(),
-            LeftPythonNonArrowUdf(),
-            LeftScalaUdf(),
-            LeftPandasUdf()
+            LeftPythonPickledUdfTest(),
+            LeftScalaUdfTest(),
+            LeftPandasUdfTest()
         ]
         self.tests_dict = { test.code: test for test in self.tests }
 

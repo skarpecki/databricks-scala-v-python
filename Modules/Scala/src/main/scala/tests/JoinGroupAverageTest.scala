@@ -5,7 +5,7 @@ import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StructType
 
 object JoinGroupAverageTest extends TestCase {
-  val name = "join_group_avg"
+  val code = "join_group_avg"
   
   override def testFunc(spark: SparkSession, df_arg: DataFrame) : DataFrame = {
     val df_o = spark.table("bronze.default.orders")
