@@ -33,13 +33,13 @@ metrics_table = dbutils.widgets.get("metrics_table")
 # COMMAND ----------
 
 from databricks_libs.udf_registry import UdfRegistry
+
 UdfRegistry().register_udf(spark)
 
 # COMMAND ----------
 
 # MAGIC %scala
-# MAGIC
-# MAGIC import tests.UdfRegistry
+# MAGIC import udfs.UdfRegistry
 # MAGIC
 # MAGIC UdfRegistry.registerUdfs(spark)
 
