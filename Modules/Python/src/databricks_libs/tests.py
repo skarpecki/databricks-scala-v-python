@@ -68,9 +68,9 @@ class LeftPythonNonArrowUdf(Test):
     """ 
     Remember to register UDFs before running
     """
-    code = "left_python_pickled_udf"
+    code = "left_python_serialized_udf"
     def test_func(self, spark: SparkSession, df: DataFrame) -> DataFrame:
-        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_PICKLED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
+        return df.selectExpr(f"{UdfRegistry.LEFT_PYTHON_SERIALIZED_UDF}({Test.COLUMN}, 3) AS {Test.COLUMN}")
 
 class LeftScalaUdf(Test):
     """ 
