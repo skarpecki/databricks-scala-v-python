@@ -1,7 +1,12 @@
 # Databricks notebook source
-from databricks_libs.tests import Test
+test_code = dbutils.widgets.get("test_code")
 
-shift = 28 # as in tests
-df = Test.prepare_dataframe(spark, shift, True)
+# COMMAND ----------
 
-df.unpersist()
+from databricks_libs.tests import TestsFactory
+
+test_object = TestsFactory().get_test_object(test_code)
+shift = 28 # dafult for tests
+df = test_object.prepare_dataframe(spark, shift, True)
+if df is not None:
+    df.unpersist()
