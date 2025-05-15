@@ -4,29 +4,32 @@ import org.apache.spark.sql.{SparkSession, DataFrame}
 import io.delta.tables.DeltaTable
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.execution.{ExtendedMode, CostMode, FormattedMode}
+import tests.TestCase
 
 class MetricsLogger(    
     spark: SparkSession,
     jobId: String,
     runId: String,
     taskId: String,
-    testName: String,
+    testObject: TestCase,
     language: String,
     metricsTableName: String) {
 
-  def timeMethodAndLogMetrics(testFunc: SparkSession => DataFrame): Unit = {
+  def timeMethodAndLogMetrics(testObject: TestCase): Unit = {
     val tstart = System.currentTimeMillis()
 
-    // Run the test function
-    val df_test = testFunc(this.spark)
-    // Force evaluation by calling an action
-    df_test.show(100)
+    // Create test dataframe and run test
+    val shift = 28 // 1 << 28 = 2^28 = 268,435,456 = 2019.6 MiB as per logical plan
+    var df_test_arg = testObject.prepareDataFrame(spark, shift)
+    val df_test = testObject.testFunc(this.spark, df_test_arg)
     val tend = System.currentTimeMillis()
     val runTimeMs = (tend - tstart).toInt
     
     val extendedPlan = df_test.queryExecution.explainString(ExtendedMode).toString()
     val costPlan = df_test.queryExecution.explainString(CostMode).toString()
     val formattedPlan = df_test.queryExecution.explainString(FormattedMode).toString()
+
+    df_test.unpersist()
 
     import spark.implicits._
 
@@ -35,7 +38,7 @@ class MetricsLogger(
         jobId,
         runId,
         taskId,
-        testName,
+        testObject.name,
         language,
         runTimeMs,
         extendedPlan,
@@ -105,7 +108,7 @@ class MetricsLogger(
         lit(jobId).as("job_id"),
         lit(runId).as("run_id"),
         lit(taskId).as("task_id"),
-        lit(testName).as("test_name"),
+        lit(testObject.name).as("test_name"),
         lit(language).as("language"),
         current_timestamp().as("current_timestamp")
       )

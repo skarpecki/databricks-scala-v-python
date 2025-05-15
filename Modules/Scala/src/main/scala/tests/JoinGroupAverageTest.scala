@@ -2,11 +2,12 @@ package tests
 
 import org.apache.spark.sql.{SparkSession, DataFrame}
 import org.apache.spark.sql.functions._
+import org.apache.spark.sql.types.StructType
 
 object JoinGroupAverageTest extends TestCase {
   val name = "join_group_avg"
   
-  def testFunc(spark: SparkSession) : DataFrame = {
+  override def testFunc(spark: SparkSession, df_arg: DataFrame) : DataFrame = {
     val df_o = spark.table("bronze.default.orders")
     val df_c = spark.table("bronze.default.customer")
     val df_n = spark.table("bronze.default.nation")
@@ -26,5 +27,10 @@ object JoinGroupAverageTest extends TestCase {
       .orderBy("n_name")
 
     return df
+  }
+
+  override def prepareDataFrame(spark: SparkSession, shift: Int, printPlan: Boolean = false): DataFrame = {
+    // Will not be used, hence return empty DataFrame
+    spark.createDataFrame(spark.sparkContext.emptyRDD[org.apache.spark.sql.Row], StructType(Seq()))
   }
 }
