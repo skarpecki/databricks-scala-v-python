@@ -26,6 +26,7 @@ object JoinGroupAverageTest extends TestCase {
       .agg(avg("o_totalprice").alias("average_totalprice"))
       .orderBy("n_name")
 
+    df.write.format("noop").mode("overwrite").save()
     return df
   }
 
