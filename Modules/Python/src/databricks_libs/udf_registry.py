@@ -9,9 +9,9 @@ class UdfRegistry:
     LEFT_SCALA_UDF = "left_scala_udf"
 
     def _left_udf_factory(self, useArrow: bool):
-        def _left_arrow(str_val, len):
+        def _left_udf(str_val, len):
             return str_val[:len]
-        return F.udf(_left_arrow, StringType(), useArrow=useArrow)
+        return F.udf(_left_udf, StringType(), useArrow=useArrow)
     
     def _left_pandas_udf_factory(self, n):
         def _left_pandas_udf(s: pd.Series) -> pd.Series:
