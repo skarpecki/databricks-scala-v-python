@@ -15,6 +15,19 @@ val metricsTable = dbutils.widgets.get("metrics_table")
 
 // COMMAND ----------
 
+// MAGIC %python
+// MAGIC from databricks_libs.udf_registry import UdfRegistry
+// MAGIC
+// MAGIC UdfRegistry().register_udf(spark)
+
+// COMMAND ----------
+
+import udfs.UdfRegistry
+
+UdfRegistry.registerUdfs(spark)
+
+// COMMAND ----------
+
 import utils.{ JobMetricsListener, MetricsLogger }
 import tests.TestsFactory
 
@@ -22,6 +35,6 @@ val listener = new JobMetricsListener()
 val metricsLogger = new MetricsLogger(spark, jobId, runId, taskId, testCode, language, metricsTable)
 
 spark.sparkContext.addSparkListener(listener)
-metricsLogger.timeMethodAndLogMetrics(TestsFactory.getTestFunc(testCode))
+metricsLogger.timeMethodAndLogMetrics(TestsFactory.getTestObject(testCode))
 
 metricsLogger.writeStageMetricsToTable(listener.stageMetrics)

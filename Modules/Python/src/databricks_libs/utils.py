@@ -2,6 +2,7 @@ from datetime import datetime
 from collections.abc import Callable
 from delta.tables import DeltaTable
 from pyspark.sql.functions import current_timestamp
+from .tests import Test
 
 def time_method_log_metrics(
     spark,
@@ -11,7 +12,7 @@ def time_method_log_metrics(
     test_name: str,
     language: str,
     metrics_table_name: str,
-    test_func: Callable[[], None]
+    test_object: Test
 ):
     """
     Measures the execution time of a test function and logs the result into a Delta table.
@@ -34,16 +35,19 @@ def time_method_log_metrics(
         test_func (Callable[[], None]): 
             A no-argument function to be executed and timed.
     """
+    shift = 28 # 1 << 28 = 2^28 = 268,435,456 = 2019.6 MiB as per logical plan
+    df_test = test_object.prepare_dataframe(spark, shift, False)
     t_start = datetime.now()
-    df_test = test_func(spark)
-    # Action to force execution
-    df_test.show(n=100)
+    df_test = test_object.test_func(spark, df_test)
     t_end = datetime.now()
     run_time_ms = (int)((t_end - t_start).total_seconds() * 1000)
     
     extended_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "extended")
     cost_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "cost")
     formatted_plan = df_test._sc._jvm.PythonSQLUtils.explainString(df_test._jdf.queryExecution(), "formatted")
+
+    df_test.unpersist()
+
     df = spark.createDataFrame([{
         "job_id": job_id,
         "run_id": run_id,
