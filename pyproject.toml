@@ -16,7 +16,5 @@ classifiers = [
 ]
 license = "MIT"
 
-
-[tool.setuptools]
-packages = ["databricks_libs"]
-package-dir = {"" = "src"}
+[tool.hatch.build.targets.wheel]
+packages = ["Modules/Python/src"]
