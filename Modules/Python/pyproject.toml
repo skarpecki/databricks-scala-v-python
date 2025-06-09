@@ -15,3 +15,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 license = "MIT"
+
+
+[tool.setuptools]
+packages = ["databricks_libs"]
+package-dir = {"" = "src"}
