@@ -31,4 +31,5 @@ metals.sbt
 
 # Python dist
 Modules/Python/dist
-Modules/Python/.venv
+Modules/Python/.ven
+dist
